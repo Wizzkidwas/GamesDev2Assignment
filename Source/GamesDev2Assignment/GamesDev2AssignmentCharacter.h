@@ -68,5 +68,34 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+/// <summary>
+/// End of UE4's prebuilt character
+/// </summary>
+protected:
+	void UseHealthPotion();
+
+	void UseMagicPotion();
+
+	void Charge();
+
+	void UpdateCharges();
+
+private:
+	UPROPERTY()
+		int healthPoints = 100;
+	UPROPERTY()
+		int magicPoints = 50;
+	UPROPERTY()
+		int healthPotions = 1;
+	UPROPERTY()
+		int magicPotions = 1;
+	UPROPERTY()
+		int baseDamage = 10;
+	UPROPERTY()
+		int damage = 10;
+	UPROPERTY()
+		int chargeStacks = 0;
+
 };
 

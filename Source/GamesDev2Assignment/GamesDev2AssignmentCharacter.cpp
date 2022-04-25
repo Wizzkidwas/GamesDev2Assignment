@@ -74,8 +74,12 @@ void AGamesDev2AssignmentCharacter::SetupPlayerInputComponent(class UInputCompon
 
 	// VR headset functionality
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AGamesDev2AssignmentCharacter::OnResetVR);
-}
 
+	// Player actions
+	PlayerInputComponent->BindAction("Charge", IE_Pressed, this, &AGamesDev2AssignmentCharacter::Charge);
+	PlayerInputComponent->BindAction("Health Potion", IE_Pressed, this, &AGamesDev2AssignmentCharacter::UseHealthPotion);
+	PlayerInputComponent->BindAction("Magic Potion", IE_Pressed, this, &AGamesDev2AssignmentCharacter::UseMagicPotion);
+}
 
 void AGamesDev2AssignmentCharacter::OnResetVR()
 {
@@ -131,4 +135,38 @@ void AGamesDev2AssignmentCharacter::MoveRight(float Value)
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
 	}
+}
+
+/// <summary>
+/// End of UE4's pre-made character
+/// </summary>
+
+void AGamesDev2AssignmentCharacter::UseHealthPotion()
+{
+	if (healthPotions > 0)
+	{	
+		healthPoints  += 50;
+		healthPotions -= 1;
+	}
+}
+
+void AGamesDev2AssignmentCharacter::UseMagicPotion()
+{
+	if (magicPotions > 0)
+	{
+		magicPoints  += 50;
+		magicPotions -= 1;
+	}
+}
+
+void AGamesDev2AssignmentCharacter::Charge()
+{
+	chargeStacks += 1;
+	magicPoints  -= 10;
+	UpdateCharges();
+}
+
+void AGamesDev2AssignmentCharacter::UpdateCharges()
+{
+	damage = baseDamage + (baseDamage * chargeStacks);
 }
