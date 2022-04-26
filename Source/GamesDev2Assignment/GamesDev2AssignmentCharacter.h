@@ -21,6 +21,8 @@ class AGamesDev2AssignmentCharacter : public ACharacter
 public:
 	AGamesDev2AssignmentCharacter();
 
+	virtual void BeginPlay() override;
+
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseTurnRate;
@@ -81,20 +83,26 @@ protected:
 
 	void UpdateCharges();
 
+	void Heal();
+
+	UPROPERTY(EditAnywhere, Category = "HUD")
+	TSubclassOf<UUserWidget> HUDClass;
+	class UPlayerHUD* HUD;
+
 private:
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, Category = "Stats")
 		int healthPoints = 100;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, Category = "Stats")
 		int magicPoints = 50;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, Category = "Stats")
 		int healthPotions = 1;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, Category = "Stats")
 		int magicPotions = 1;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, Category = "Stats")
 		int baseDamage = 10;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, Category = "Stats")
 		int damage = 10;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, Category = "Stats")
 		int chargeStacks = 0;
 
 };

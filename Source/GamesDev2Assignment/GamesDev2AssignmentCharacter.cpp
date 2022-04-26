@@ -8,6 +8,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Blueprint/UserWidget.h"
+#include "PlayerHUD.h"
+#include "Kismet/GameplayStatics.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AGamesDev2AssignmentCharacter
@@ -47,6 +50,18 @@ AGamesDev2AssignmentCharacter::AGamesDev2AssignmentCharacter()
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
 
+void AGamesDev2AssignmentCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (IsLocallyControlled() && HUDClass)
+	{
+		HUD = CreateWidget<UPlayerHUD>(UGameplayStatics::GetPlayerController(GetWorld(), 0), HUDClass);
+		HUD->AddToViewport();
+		HUD->UpdateHUD(healthPoints, magicPoints, healthPotions, magicPotions, chargeStacks);
+	}
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Input
 
@@ -76,9 +91,10 @@ void AGamesDev2AssignmentCharacter::SetupPlayerInputComponent(class UInputCompon
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AGamesDev2AssignmentCharacter::OnResetVR);
 
 	// Player actions
-	PlayerInputComponent->BindAction("Charge", IE_Pressed, this, &AGamesDev2AssignmentCharacter::Charge);
 	PlayerInputComponent->BindAction("Health Potion", IE_Pressed, this, &AGamesDev2AssignmentCharacter::UseHealthPotion);
 	PlayerInputComponent->BindAction("Magic Potion", IE_Pressed, this, &AGamesDev2AssignmentCharacter::UseMagicPotion);
+	PlayerInputComponent->BindAction("Charge", IE_Pressed, this, &AGamesDev2AssignmentCharacter::Charge);
+	PlayerInputComponent->BindAction("Heal", IE_Pressed, this, &AGamesDev2AssignmentCharacter::Heal);
 }
 
 void AGamesDev2AssignmentCharacter::OnResetVR()
@@ -148,6 +164,8 @@ void AGamesDev2AssignmentCharacter::UseHealthPotion()
 		healthPoints  += 50;
 		healthPotions -= 1;
 	}
+	HUD->UpdateHPText(healthPoints);
+	HUD->UpdateHPotionsText(healthPotions);
 }
 
 void AGamesDev2AssignmentCharacter::UseMagicPotion()
@@ -157,16 +175,34 @@ void AGamesDev2AssignmentCharacter::UseMagicPotion()
 		magicPoints  += 50;
 		magicPotions -= 1;
 	}
+	HUD->UpdateMPText(magicPoints);
+	HUD->UpdateMPotionsText(magicPotions);
 }
 
 void AGamesDev2AssignmentCharacter::Charge()
 {
-	chargeStacks += 1;
-	magicPoints  -= 10;
-	UpdateCharges();
+	if (magicPoints >= 10)
+	{
+		chargeStacks += 1;
+		magicPoints  -= 10;
+		HUD->UpdateMPText(magicPoints);
+		UpdateCharges();
+	}
 }
 
 void AGamesDev2AssignmentCharacter::UpdateCharges()
 {
 	damage = baseDamage + (baseDamage * chargeStacks);
+	HUD->UpdateCStacksText(chargeStacks);
+}
+
+void AGamesDev2AssignmentCharacter::Heal()
+{
+	if (magicPoints >= 20)
+	{
+		magicPoints  -= 20;
+		healthPoints += 80;
+		HUD->UpdateHPText(healthPoints);
+		HUD->UpdateMPText(magicPoints);
+	}
 }
