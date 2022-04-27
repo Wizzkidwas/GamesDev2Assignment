@@ -25,9 +25,10 @@ void AEnemyAIController::Tick(float DeltaTime)
 	// if (PlayerPawn) SetFocus(PlayerPawn);
 	if (LineOfSightTo(PlayerPawn, FVector(0, 0, 0)) && !waiting)
 	{
-		FVector AIForwardVector = AICharacter->GetActorForwardVector(); // Already nomalised
+		APawn* AIPawn = GetPawn();
+		FVector AIForwardVector = AIPawn->GetActorForwardVector(); // Already nomalised
 		FVector PlayerPositionVector = PlayerPawn->GetActorLocation();
-		FVector AIPositionVector = AICharacter->GetActorLocation();
+		FVector AIPositionVector = AIPawn->GetActorLocation();
 		FVector AIToPlayerVector = PlayerPositionVector - AIPositionVector;
 		AIToPlayerVector.Normalize(); // This vector must be explicitly normalised
 		float DirectionDotProduct = FVector::DotProduct(AIToPlayerVector, AIForwardVector);
@@ -37,22 +38,14 @@ void AEnemyAIController::Tick(float DeltaTime)
 			MoveToActor(PlayerPawn, 10.0f);
 			UE_LOG(LogTemp, Warning, TEXT("PLAYER SPOTTED"))
 			chasing = true;
-			GetWorld()->GetTimerManager().SetTimer(ShootTimerHandle, [&]()
-				{
-					AICharacter->Shoot();
-					UE_LOG(LogTemp, Warning, TEXT("SHOOT"))
-				}, 1, true, 1);
+			AICharacter->Shoot();
+			UE_LOG(LogTemp, Warning, TEXT("SHOOT"))
 		}
 	}
 
-	/*if (chasing && FVector::Dist(PlayerPawn->GetActorLocation(), AICharacter->GetActorLocation()) < 100.0f)
+	if (chasing)
 	{
-		GetWorld()->GetTimerManager().SetTimer(ShootTimerHandle, [&]()
-		{
-			AICharacter->Shoot();
-			UE_LOG(LogTemp, Warning, TEXT("SHOOT"))
-		}, 1, false);
-	}*/
+	}
 }
 
 AActor* AEnemyAIController::ChooseWaypoint()
