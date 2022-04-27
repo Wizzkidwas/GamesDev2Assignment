@@ -9,13 +9,14 @@ UPlayerHUD::UPlayerHUD(const FObjectInitializer& ObjectInitializer) : Super(Obje
 
 }
 
-void UPlayerHUD::UpdateHUD(int HP, int MP, int HPotions, int MPotions, int CStacks)
+void UPlayerHUD::UpdateHUD(int HP, int MP, int HPotions, int MPotions, int CStacks, int SStacks)
 {
 	UpdateHPText(HP);
 	UpdateMPText(MP);
 	UpdateHPotionsText(HPotions);
 	UpdateMPotionsText(MPotions);
 	UpdateCStacksText(CStacks);
+	UpdateSStacksText(SStacks);
 }
 
 void UPlayerHUD::UpdateHPText(int HP)
@@ -55,5 +56,13 @@ void UPlayerHUD::UpdateCStacksText(int CStacks)
 	if (TB_CStacksText)
 	{
 		TB_CStacksText->SetText(FText::FromString(FString("Charge Stacks: " + FString::FromInt(CStacks))));
+	}
+}
+
+void UPlayerHUD::UpdateSStacksText(int SStacks)
+{
+	if (TB_SStacksText)
+	{
+		TB_SStacksText->SetText(FText::FromString(FString("Speed Stacks: " + FString::FromInt(SStacks))));
 	}
 }

@@ -29,9 +29,11 @@ protected:
 		UTextBlock* TB_MPotionsText;
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* TB_CStacksText;
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* TB_SStacksText;
 
 public:
-	void UpdateHUD(int HP, int MP, int HPotions, int MPotions, int CStacks);
+	void UpdateHUD(int HP, int MP, int HPotions, int MPotions, int CStacks, int SStacks);
 
 	void UpdateHPText(int HP);
 
@@ -42,4 +44,6 @@ public:
 	void UpdateMPotionsText(int MPotions);
 
 	void UpdateCStacksText(int CStacks);
+
+	void UpdateSStacksText(int SStacks);
 };

@@ -11,6 +11,8 @@
 #include "Blueprint/UserWidget.h"
 #include "PlayerHUD.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "ProjectileActor.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AGamesDev2AssignmentCharacter
@@ -48,17 +50,20 @@ AGamesDev2AssignmentCharacter::AGamesDev2AssignmentCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+	projectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("Projectile Spawn Point"));
+	projectileSpawnPoint->SetupAttachment(RootComponent);
+	projectileSpawnPoint->SetRelativeLocation(FVector(50.0f, 0.0f, 40.0f));
 }
 
 void AGamesDev2AssignmentCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
+	GetCharacterMovement()->MaxWalkSpeed = baseWalkSpeed;
 	if (IsLocallyControlled() && HUDClass)
 	{
 		HUD = CreateWidget<UPlayerHUD>(UGameplayStatics::GetPlayerController(GetWorld(), 0), HUDClass);
 		HUD->AddToViewport();
-		HUD->UpdateHUD(healthPoints, magicPoints, healthPotions, magicPotions, chargeStacks);
+		HUD->UpdateHUD(healthPoints, magicPoints, healthPotions, magicPotions, chargeStacks, speedStacks);
 	}
 }
 
@@ -95,6 +100,19 @@ void AGamesDev2AssignmentCharacter::SetupPlayerInputComponent(class UInputCompon
 	PlayerInputComponent->BindAction("Magic Potion", IE_Pressed, this, &AGamesDev2AssignmentCharacter::UseMagicPotion);
 	PlayerInputComponent->BindAction("Charge", IE_Pressed, this, &AGamesDev2AssignmentCharacter::Charge);
 	PlayerInputComponent->BindAction("Heal", IE_Pressed, this, &AGamesDev2AssignmentCharacter::Heal);
+	PlayerInputComponent->BindAction("Speed Up", IE_Pressed, this, &AGamesDev2AssignmentCharacter::SpeedUp);
+	PlayerInputComponent->BindAction("Shoot", IE_Pressed, this, &AGamesDev2AssignmentCharacter::Shoot);
+}
+
+float AGamesDev2AssignmentCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	healthPoints -= DamageAmount;
+	HUD->UpdateHPText(healthPoints);
+	if (healthPoints <= 0)
+	{
+		Destroy();
+	}
+	return DamageAmount;
 }
 
 void AGamesDev2AssignmentCharacter::OnResetVR()
@@ -134,7 +152,7 @@ void AGamesDev2AssignmentCharacter::MoveForward(float Value)
 
 		// get forward vector
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		AddMovementInput(Direction, Value);
+		AddMovementInput(Direction, Value * speedModifier);
 	}
 }
 
@@ -149,7 +167,7 @@ void AGamesDev2AssignmentCharacter::MoveRight(float Value)
 		// get right vector 
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// add movement in that direction
-		AddMovementInput(Direction, Value);
+		AddMovementInput(Direction, Value * speedModifier);
 	}
 }
 
@@ -204,5 +222,34 @@ void AGamesDev2AssignmentCharacter::Heal()
 		healthPoints += 80;
 		HUD->UpdateHPText(healthPoints);
 		HUD->UpdateMPText(magicPoints);
+	}
+}
+
+void AGamesDev2AssignmentCharacter::SpeedUp()
+{
+	if (magicPoints >= 25)
+	{
+		magicPoints -= 25;
+		speedStacks += 1;
+		HUD->UpdateMPText(magicPoints);
+		UpdateSpeed();
+	}
+}
+
+void AGamesDev2AssignmentCharacter::UpdateSpeed()
+{
+	speedModifier = 1 + (speedStacks * 0.5f);
+	GetCharacterMovement()->MaxWalkSpeed = baseWalkSpeed * speedModifier;
+	HUD->UpdateSStacksText(speedStacks);
+}
+
+void AGamesDev2AssignmentCharacter::Shoot()
+{
+	if (ProjectileClass)
+	{
+		FVector  SpawnLocation = projectileSpawnPoint->GetComponentLocation();
+		FRotator SpawnRotation = projectileSpawnPoint->GetComponentRotation();
+		AProjectileActor* TempProjectile = GetWorld()->SpawnActor<AProjectileActor>(ProjectileClass, SpawnLocation, SpawnRotation);
+		TempProjectile->SetOwner(this);
 	}
 }

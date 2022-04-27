@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "SimpleAI_Character.generated.h"
 
+class AProjectileActor;
+
 UCLASS()
 class GAMESDEV2ASSIGNMENT_API ASimpleAI_Character : public ACharacter
 {
@@ -25,6 +27,7 @@ public:
 		float BaseLookUpRate;
 
 protected:
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	/** Resets HMD orientation in VR. */
 	void OnResetVR();
@@ -58,7 +61,16 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// End of APawn interface
 
+public:
+	void Shoot();
+
 private:
+	UPROPERTY(EditAnywhere)
+		USceneComponent* projectileSpawnPoint;
+
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<AProjectileActor> ProjectileClass;
+	
 	UPROPERTY(EditAnywhere, Category = "Stats")
 		int healthPoints = 100;
 	UPROPERTY(EditAnywhere, Category = "Stats")

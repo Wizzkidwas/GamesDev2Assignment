@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "GamesDev2AssignmentCharacter.generated.h"
 
+class AProjectileActor;
+
 UCLASS(config=Game)
 class AGamesDev2AssignmentCharacter : public ACharacter
 {
@@ -32,6 +34,7 @@ public:
 	float BaseLookUpRate;
 
 protected:
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	/** Resets HMD orientation in VR. */
 	void OnResetVR();
@@ -85,11 +88,23 @@ protected:
 
 	void Heal();
 
+	void SpeedUp();
+
+	void UpdateSpeed();
+
+	void Shoot();
+
 	UPROPERTY(EditAnywhere, Category = "HUD")
 	TSubclassOf<UUserWidget> HUDClass;
 	class UPlayerHUD* HUD;
 
 private:
+	UPROPERTY(EditAnywhere)
+		USceneComponent* projectileSpawnPoint;
+
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<AProjectileActor> ProjectileClass;
+
 	UPROPERTY(EditAnywhere, Category = "Stats")
 		int healthPoints = 100;
 	UPROPERTY(EditAnywhere, Category = "Stats")
@@ -104,6 +119,10 @@ private:
 		int damage = 10;
 	UPROPERTY(EditAnywhere, Category = "Stats")
 		int chargeStacks = 0;
+	UPROPERTY(EditAnywhere, Category = "Stats")
+		int speedStacks = 0;
 
+	float speedModifier = 1;
+	float baseWalkSpeed = 600.0f;
 };
 

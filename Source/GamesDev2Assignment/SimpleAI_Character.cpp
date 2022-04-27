@@ -6,6 +6,8 @@
 #include "Components/InputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
+#include "Kismet/GameplayStatics.h"
+#include "ProjectileActor.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ASimpleAI_Character
@@ -32,6 +34,9 @@ ASimpleAI_Character::ASimpleAI_Character()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+	projectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("Projectile Spawn Point"));
+	projectileSpawnPoint->SetupAttachment(RootComponent);
+	projectileSpawnPoint->SetRelativeLocation(FVector(50.0f, 0.0f, 40.0f));
 }
 
 void ASimpleAI_Character::BeginPlay()
@@ -66,6 +71,16 @@ void ASimpleAI_Character::SetupPlayerInputComponent(class UInputComponent* Playe
 
 	// VR headset functionality
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &ASimpleAI_Character::OnResetVR);
+}
+
+float ASimpleAI_Character::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	healthPoints -= DamageAmount;
+	if (healthPoints <= 0)
+	{
+		Destroy();
+	}
+	return DamageAmount;
 }
 
 void ASimpleAI_Character::OnResetVR()
@@ -121,5 +136,16 @@ void ASimpleAI_Character::MoveRight(float Value)
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
+	}
+}
+
+void ASimpleAI_Character::Shoot()
+{
+	if (ProjectileClass)
+	{
+		FVector  SpawnLocation = projectileSpawnPoint->GetComponentLocation();
+		FRotator SpawnRotation = projectileSpawnPoint->GetComponentRotation();
+		AProjectileActor* TempProjectile = GetWorld()->SpawnActor<AProjectileActor>(ProjectileClass, SpawnLocation, SpawnRotation);
+		TempProjectile->SetOwner(this);
 	}
 }
