@@ -23,7 +23,7 @@ void UPlayerHUD::UpdateHPText(int HP)
 {
 	if (TB_HPText)
 	{
-		TB_HPText->SetText(FText::FromString(FString("Health: " + FString::FromInt(HP))));
+		TB_HPText->SetText(FText::FromString(FString("Health: " + FString::FromInt(HP) + " / 200")));
 	}
 }
 
@@ -31,7 +31,7 @@ void UPlayerHUD::UpdateMPText(int MP)
 {
 	if (TB_MPText)
 	{
-		TB_MPText->SetText(FText::FromString(FString("Magic: " + FString::FromInt(MP))));
+		TB_MPText->SetText(FText::FromString(FString("Magic: " + FString::FromInt(MP) + " / 100")));
 	}
 }
 
@@ -55,7 +55,7 @@ void UPlayerHUD::UpdateCStacksText(int CStacks)
 {
 	if (TB_CStacksText)
 	{
-		TB_CStacksText->SetText(FText::FromString(FString("Charge Stacks: " + FString::FromInt(CStacks))));
+		TB_CStacksText->SetText(FText::FromString(FString("Charge Stacks: " + FString::FromInt(CStacks) + " / 5")));
 	}
 }
 
@@ -63,6 +63,6 @@ void UPlayerHUD::UpdateSStacksText(int SStacks)
 {
 	if (TB_SStacksText)
 	{
-		TB_SStacksText->SetText(FText::FromString(FString("Speed Stacks: " + FString::FromInt(SStacks))));
+		TB_SStacksText->SetText(FText::FromString(FString("Speed Stacks: " + FString::FromInt(SStacks) + " / 5")));
 	}
 }

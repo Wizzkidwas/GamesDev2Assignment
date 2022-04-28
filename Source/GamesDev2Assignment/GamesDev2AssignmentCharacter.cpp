@@ -197,10 +197,18 @@ void AGamesDev2AssignmentCharacter::MoveRight(float Value)
 
 void AGamesDev2AssignmentCharacter::UseHealthPotion()
 {
+	if (healthPoints == 200)
+	{
+		return;
+	}
 	if (healthPotions > 0)
 	{	
 		healthPoints  += 50;
 		healthPotions -= 1;
+	}
+	if (healthPoints > 200)
+	{
+		healthPoints = 200;
 	}
 	HUD->UpdateHPText(healthPoints);
 	HUD->UpdateHPotionsText(healthPotions);
@@ -208,10 +216,18 @@ void AGamesDev2AssignmentCharacter::UseHealthPotion()
 
 void AGamesDev2AssignmentCharacter::UseMagicPotion()
 {
+	if (magicPoints == 100)
+	{
+		return;
+	}
 	if (magicPotions > 0)
 	{
 		magicPoints  += 50;
 		magicPotions -= 1;
+	}
+	if (magicPoints > 100)
+	{	
+		magicPoints = 100;
 	}
 	HUD->UpdateMPText(magicPoints);
 	HUD->UpdateMPotionsText(magicPotions);
@@ -219,6 +235,10 @@ void AGamesDev2AssignmentCharacter::UseMagicPotion()
 
 void AGamesDev2AssignmentCharacter::Charge()
 {
+	if (chargeStacks == 5)
+	{
+		return;
+	}
 	if (magicPoints >= 10)
 	{
 		chargeStacks += 1;
@@ -236,10 +256,18 @@ void AGamesDev2AssignmentCharacter::UpdateCharges()
 
 void AGamesDev2AssignmentCharacter::Heal()
 {
+	if (healthPoints == 200)
+	{
+		return;
+	}
 	if (magicPoints >= 20)
 	{
 		magicPoints  -= 20;
 		healthPoints += 80;
+		if (healthPoints > 200)
+		{
+			healthPoints = 200;
+		}
 		HUD->UpdateHPText(healthPoints);
 		HUD->UpdateMPText(magicPoints);
 	}
@@ -247,6 +275,10 @@ void AGamesDev2AssignmentCharacter::Heal()
 
 void AGamesDev2AssignmentCharacter::SpeedUp()
 {
+	if (speedStacks == 5)
+	{
+		return;
+	}
 	if (magicPoints >= 25)
 	{
 		magicPoints -= 25;
@@ -261,6 +293,12 @@ void AGamesDev2AssignmentCharacter::UpdateSpeed()
 	speedModifier = 1 + (speedStacks * 0.5f);
 	GetCharacterMovement()->MaxWalkSpeed = baseWalkSpeed * speedModifier;
 	HUD->UpdateSStacksText(speedStacks);
+	GetWorld()->GetTimerManager().SetTimer(SpeedTimerHandle, [&]()
+		{
+			speedStacks--;
+			UpdateSpeed();
+			UE_LOG(LogTemp, Warning, TEXT("Speed down"))
+		}, 10, true, 10);
 }
 
 void AGamesDev2AssignmentCharacter::Shoot()
