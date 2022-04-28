@@ -25,6 +25,8 @@ public:
 
 	virtual void BeginPlay() override;
 
+	virtual void Tick(float DeltaTime) override;
+
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseTurnRate;
@@ -97,6 +99,13 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "HUD")
 	TSubclassOf<UUserWidget> HUDClass;
 	class UPlayerHUD* HUD;
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "Potions")
+		void AddHealthPotion();
+
+	UFUNCTION(BlueprintCallable, Category = "Potions")
+		void AddMagicPotion();
 
 private:
 	UPROPERTY(EditAnywhere)

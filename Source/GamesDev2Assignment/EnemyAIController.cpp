@@ -32,19 +32,24 @@ void AEnemyAIController::Tick(float DeltaTime)
 		AIToPlayerVector.Normalize(); // This vector must be explicitly normalised
 		float DirectionDotProduct = FVector::DotProduct(AIToPlayerVector, AIForwardVector);
 
-		if (DirectionDotProduct > 0.5f)
+		if (DirectionDotProduct > 0.4f)
 		{
 			MoveToActor(PlayerPawn, 10.0f);
 			UE_LOG(LogTemp, Warning, TEXT("PLAYER SPOTTED"))
 			chasing = true;
 			GetWorld()->GetTimerManager().SetTimer(ShootTimerHandle, [&]()
-				{
-					AICharacter->Shoot();
-					UE_LOG(LogTemp, Warning, TEXT("SHOOT"))
-				}, 1, true, 1);
+			{
+				AICharacter->Shoot();
+				UE_LOG(LogTemp, Warning, TEXT("SHOOT"))
+			}, 1, true, 1);
 		}
 	}
 
+	if (!AICharacter)
+	{
+		GetWorldTimerManager().ClearTimer(ShootTimerHandle);
+		GetWorldTimerManager().ClearTimer(TimerHandle);
+	}
 	/*if (chasing && FVector::Dist(PlayerPawn->GetActorLocation(), AICharacter->GetActorLocation()) < 100.0f)
 	{
 		GetWorld()->GetTimerManager().SetTimer(ShootTimerHandle, [&]()
@@ -63,15 +68,16 @@ AActor* AEnemyAIController::ChooseWaypoint()
 
 void AEnemyAIController::RandomPatrol()
 {
-	chasing = false;
 	MoveToActor(ChooseWaypoint(), 10.0f);
 	UE_LOG(LogTemp, Warning, TEXT("Begin next movement"))
+	chasing = false;
 	waiting = false;
 }
 
 void AEnemyAIController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
 {
 	Super::OnMoveCompleted(RequestID, Result);
+	chasing = false;
 	waiting = true;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AEnemyAIController::RandomPatrol, 6.0f, false, 6.0f);
 }

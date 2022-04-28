@@ -19,7 +19,6 @@ AProjectileActor::AProjectileActor()
 	projectileMovement->MaxSpeed = movementSpeed;
 	projectileMovement->InitialSpeed = movementSpeed;
 	InitialLifeSpan = 4.0f;
-
 }
 
 // Called when the game starts or when spawned
@@ -52,4 +51,9 @@ void AProjectileActor::OnHit(AActor* SelfActor, AActor* OtherActor, FVector Norm
 			Destroy();
 		}
 	}
+}
+
+void AProjectileActor::SetDamage(float Damage)
+{
+	ProjectileDamage = Damage;
 }

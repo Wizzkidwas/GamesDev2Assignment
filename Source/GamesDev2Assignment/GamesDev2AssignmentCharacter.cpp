@@ -13,6 +13,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "ProjectileActor.h"
+#include "MagicPotionItem.h"
+#include "HealthPotionItem.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AGamesDev2AssignmentCharacter
@@ -58,12 +60,30 @@ AGamesDev2AssignmentCharacter::AGamesDev2AssignmentCharacter()
 void AGamesDev2AssignmentCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	PrimaryActorTick.bCanEverTick = true;
 	GetCharacterMovement()->MaxWalkSpeed = baseWalkSpeed;
 	if (IsLocallyControlled() && HUDClass)
 	{
 		HUD = CreateWidget<UPlayerHUD>(UGameplayStatics::GetPlayerController(GetWorld(), 0), HUDClass);
 		HUD->AddToViewport();
 		HUD->UpdateHUD(healthPoints, magicPoints, healthPotions, magicPotions, chargeStacks, speedStacks);
+	}
+}
+
+void AGamesDev2AssignmentCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	int random = FMath::RandRange(1, 200);
+	if (random == 1)
+	{
+		AddHealthPotion();
+		UE_LOG(LogTemp, Warning, TEXT("Health Potion"));
+	}
+	else if (random == 2)
+	{
+		AddMagicPotion();
+		UE_LOG(LogTemp, Warning, TEXT("Magic Potion"));
 	}
 }
 
@@ -251,5 +271,23 @@ void AGamesDev2AssignmentCharacter::Shoot()
 		FRotator SpawnRotation = projectileSpawnPoint->GetComponentRotation();
 		AProjectileActor* TempProjectile = GetWorld()->SpawnActor<AProjectileActor>(ProjectileClass, SpawnLocation, SpawnRotation);
 		TempProjectile->SetOwner(this);
+		TempProjectile->SetDamage(damage);
+		if (chargeStacks > 0)
+		{
+			chargeStacks--;
+			UpdateCharges();
+		}
 	}
+}
+
+void AGamesDev2AssignmentCharacter::AddHealthPotion()
+{
+	healthPotions++;
+	HUD->UpdateHPotionsText(healthPotions);
+}
+
+void AGamesDev2AssignmentCharacter::AddMagicPotion()
+{
+	magicPotions++;
+	HUD->UpdateMPotionsText(magicPotions);
 }

@@ -75,6 +75,5 @@ private:
 		int healthPoints = 100;
 	UPROPERTY(EditAnywhere, Category = "Stats")
 		int damage = 10;
-
 };
 

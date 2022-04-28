@@ -147,5 +147,6 @@ void ASimpleAI_Character::Shoot()
 		FRotator SpawnRotation = projectileSpawnPoint->GetComponentRotation();
 		AProjectileActor* TempProjectile = GetWorld()->SpawnActor<AProjectileActor>(ProjectileClass, SpawnLocation, SpawnRotation);
 		TempProjectile->SetOwner(this);
+		TempProjectile->SetDamage(damage);
 	}
 }
