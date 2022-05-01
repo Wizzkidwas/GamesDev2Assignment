@@ -303,9 +303,12 @@ void AGamesDev2AssignmentCharacter::UpdateSpeed()
 	HUD->UpdateSStacksText(speedStacks);
 	GetWorld()->GetTimerManager().SetTimer(SpeedTimerHandle, [&]()
 		{
-			speedStacks--;
-			UpdateSpeed();
-			UE_LOG(LogTemp, Warning, TEXT("Speed down"))
+			if (speedStacks > 0)
+			{
+				speedStacks--;
+				UpdateSpeed();
+				UE_LOG(LogTemp, Warning, TEXT("Speed down"))
+			}
 		}, 10, true, 10);
 }
 
