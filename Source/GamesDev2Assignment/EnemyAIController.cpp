@@ -23,7 +23,7 @@ void AEnemyAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	// if (PlayerPawn) SetFocus(PlayerPawn);
-	if (LineOfSightTo(PlayerPawn, FVector(0, 0, 0)) && !waiting)
+	if (LineOfSightTo(PlayerPawn, FVector(0, 0, 0)) && !waiting && !dead)
 	{
 		FVector AIForwardVector = AICharacter->GetActorForwardVector(); // Already nomalised
 		FVector PlayerPositionVector = PlayerPawn->GetActorLocation();
@@ -36,28 +36,16 @@ void AEnemyAIController::Tick(float DeltaTime)
 		{
 			MoveToActor(PlayerPawn, 10.0f);
 			UE_LOG(LogTemp, Warning, TEXT("PLAYER SPOTTED"))
-			chasing = true;
 			GetWorld()->GetTimerManager().SetTimer(ShootTimerHandle, [&]()
 			{
-				AICharacter->Shoot();
-				UE_LOG(LogTemp, Warning, TEXT("SHOOT"))
+				if (!dead)
+				{
+					AICharacter->Shoot();
+					UE_LOG(LogTemp, Warning, TEXT("SHOOT"))
+				}
 			}, 1, true, 1);
 		}
 	}
-
-	if (!AICharacter)
-	{
-		GetWorldTimerManager().ClearTimer(ShootTimerHandle);
-		GetWorldTimerManager().ClearTimer(TimerHandle);
-	}
-	/*if (chasing && FVector::Dist(PlayerPawn->GetActorLocation(), AICharacter->GetActorLocation()) < 100.0f)
-	{
-		GetWorld()->GetTimerManager().SetTimer(ShootTimerHandle, [&]()
-		{
-			AICharacter->Shoot();
-			UE_LOG(LogTemp, Warning, TEXT("SHOOT"))
-		}, 1, false);
-	}*/
 }
 
 AActor* AEnemyAIController::ChooseWaypoint()
@@ -70,14 +58,20 @@ void AEnemyAIController::RandomPatrol()
 {
 	MoveToActor(ChooseWaypoint(), 10.0f);
 	UE_LOG(LogTemp, Warning, TEXT("Begin next movement"))
-	chasing = false;
 	waiting = false;
 }
 
 void AEnemyAIController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
 {
 	Super::OnMoveCompleted(RequestID, Result);
-	chasing = false;
 	waiting = true;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AEnemyAIController::RandomPatrol, 6.0f, false, 6.0f);
 }
+
+void AEnemyAIController::StopTimers()
+{
+	dead = true;
+	GetWorldTimerManager().ClearTimer(ShootTimerHandle);
+	GetWorldTimerManager().ClearTimer(TimerHandle);
+}
+

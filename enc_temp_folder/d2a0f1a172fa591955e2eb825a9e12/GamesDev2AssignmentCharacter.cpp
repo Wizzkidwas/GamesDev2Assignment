@@ -71,21 +71,17 @@ void AGamesDev2AssignmentCharacter::BeginPlay()
 	GetWorld()->GetTimerManager().SetTimer(PotionTimerHandle, [&]()
 		{
 			int random = FMath::RandRange(1, 3);
-			switch (random)
+			if (random == 1)
 			{
-				case 1:
-					AddHealthPotion();
-					UE_LOG(LogTemp, Warning, TEXT("Health Potion"));
-					break;
-				case 2:
-					AddMagicPotion();
-					UE_LOG(LogTemp, Warning, TEXT("Magic Potion"));
-					break;
-				default:
-					UE_LOG(LogTemp, Warning, TEXT("Nothing"));
-					break;
+				AddHealthPotion();
+				UE_LOG(LogTemp, Warning, TEXT("Health Potion"));
 			}
-		}, 5, true, 5);
+			else if (random == 2)
+			{
+				AddMagicPotion();
+				UE_LOG(LogTemp, Warning, TEXT("Magic Potion"));
+			}
+		}, 10, true, 10);
 }
 
 void AGamesDev2AssignmentCharacter::Tick(float DeltaTime)

@@ -8,6 +8,7 @@
 #include "GameFramework/Controller.h"
 #include "Kismet/GameplayStatics.h"
 #include "ProjectileActor.h"
+#include "EnemyAIController.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ASimpleAI_Character
@@ -78,6 +79,11 @@ float ASimpleAI_Character::TakeDamage(float DamageAmount, FDamageEvent const& Da
 	healthPoints -= DamageAmount;
 	if (healthPoints <= 0)
 	{
+		AIController = Cast<AEnemyAIController>(GetController());
+		if (AIController)
+		{
+			AIController->StopTimers();
+		}
 		Destroy();
 	}
 	return DamageAmount;
@@ -149,4 +155,9 @@ void ASimpleAI_Character::Shoot()
 		TempProjectile->SetOwner(this);
 		TempProjectile->SetDamage(damage);
 	}
+}
+
+int ASimpleAI_Character::GetHealthPoints()
+{
+	return healthPoints;
 }

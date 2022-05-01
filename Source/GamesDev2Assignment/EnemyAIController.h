@@ -28,6 +28,8 @@ protected:
 public:
 	void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result) override;
 
+	void StopTimers();
+
 private:
 	APawn* PlayerPawn;
 
@@ -39,7 +41,7 @@ private:
 
 	bool waiting;
 
-	bool chasing;
+	bool dead;
 
 	UPROPERTY()
 		TArray<AActor*> waypoints;

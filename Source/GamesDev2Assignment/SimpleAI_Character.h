@@ -7,6 +7,7 @@
 #include "SimpleAI_Character.generated.h"
 
 class AProjectileActor;
+class AEnemyAIController;
 
 UCLASS()
 class GAMESDEV2ASSIGNMENT_API ASimpleAI_Character : public ACharacter
@@ -64,7 +65,11 @@ protected:
 public:
 	void Shoot();
 
+	int GetHealthPoints();
+
 private:
+	AEnemyAIController* AIController;
+
 	UPROPERTY(EditAnywhere)
 		USceneComponent* projectileSpawnPoint;
 

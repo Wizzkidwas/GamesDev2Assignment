@@ -134,6 +134,7 @@ private:
 	float speedModifier = 1;
 	float baseWalkSpeed = 600.0f;
 
+	FTimerHandle PotionTimerHandle;
 	FTimerHandle SpeedTimerHandle;
 };
 
